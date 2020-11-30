@@ -113,7 +113,7 @@ public class TaoProxy implements Proxy {
             }
 
             // Initialize the sequencer and proxy
-            mSequencer = new TaoSequencer(mMessageCreator, mPathCreator);
+            mSequencer = new TaoSequencer(mMessageCreator, mPathCreator, mProfiler);
             mProcessor = new TaoProcessor(this, mSequencer, mThreadGroup, mMessageCreator, mPathCreator, mCryptoUtil, mSubtree, mPositionMap, mRelativeLeafMapper, mProfiler);
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,7 +155,7 @@ public class TaoProxy implements Proxy {
             mThreadGroup = AsynchronousChannelGroup.withFixedThreadPool(TaoConfigs.PROXY_THREAD_COUNT, Executors.defaultThreadFactory());
 
             // Initialize the sequencer and proxy
-            mSequencer = new TaoSequencer(mMessageCreator, mPathCreator);
+            mSequencer = new TaoSequencer(mMessageCreator, mPathCreator, mProfiler);
             mProcessor = processor;
 
             // Map each leaf to a relative leaf for the servers

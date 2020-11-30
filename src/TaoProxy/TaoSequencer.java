@@ -37,10 +37,13 @@ public class TaoSequencer implements Sequencer {
     // A map of each client to a channel to that client
     protected Map<InetSocketAddress, AsynchronousSocketChannel> mChannelMap;
 
+    // The Profiler to store timing information
+    protected Profiler mProfiler;
+
     /**
      * @brief Default constructor for the TaoStore Sequencer
      */
-    public TaoSequencer(MessageCreator messageCreator, PathCreator pathCreator) {
+    public TaoSequencer(MessageCreator messageCreator, PathCreator pathCreator, Profiler profiler) {
         try {
             // Assign message creator
             mMessageCreator = messageCreator;
@@ -59,6 +62,8 @@ public class TaoSequencer implements Sequencer {
 
             // Thread group used for asynchronous I/O
             mThreadGroup = AsynchronousChannelGroup.withFixedThreadPool(TaoConfigs.PROXY_THREAD_COUNT, Executors.defaultThreadFactory());
+
+            mProfiler = profiler;
 
             // Run the serialize procedure in a different thread
             Runnable serializeProcedure = this::serializationProcedure;
@@ -171,6 +176,9 @@ public class TaoSequencer implements Sequencer {
                     // Remove request from request map
                     mRequestMap.remove(req);
                 }
+
+                mProfiler.readPathComplete(req);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

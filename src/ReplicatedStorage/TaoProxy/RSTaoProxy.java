@@ -77,7 +77,7 @@ public class RSTaoProxy extends TaoProxy {
             }
 
             // Initialize the sequencer and proxy
-            mSequencer = new TaoSequencer(mMessageCreator, mPathCreator);
+            mSequencer = new TaoSequencer(mMessageCreator, mPathCreator, mProfiler);
             mProcessor = new RSTaoProcessor(this, mSequencer, mThreadGroup, mMessageCreator, mPathCreator, mCryptoUtil, mSubtree, mPositionMap, mRelativeLeafMapper, mProfiler);
         } catch (Exception e) {
             e.printStackTrace();
