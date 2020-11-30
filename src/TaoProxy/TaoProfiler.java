@@ -14,6 +14,8 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class TaoProfiler implements Profiler {
 
+    protected int j = 0;
+
     protected String mOutputDirectory;
 
     protected DescriptiveStatistics mReadPathStatistics;
@@ -78,8 +80,10 @@ public class TaoProfiler implements Profiler {
             report += "\nHistogram\n";
 
             for (double value : mReadPathStatistics.getSortedValues()) {
-                if (lastValue != -1.0 && value != lastValue) {
-                    report += String.format("%.2f %d\n", lastValue, i);
+                if (value != lastValue) {
+                    if (lastValue != -1.0) {
+                        report += String.format("%.2f %d\n", lastValue, i);
+                    }
                     i = 0;
                     lastValue = value;
                 }
@@ -203,7 +207,10 @@ public class TaoProfiler implements Profiler {
     }
 
     public void readPathStart(ClientRequest req) {
-        mReadPathStartTimes.put(req, System.currentTimeMillis());
+        if (j >= 100) {
+            mReadPathStartTimes.put(req, System.currentTimeMillis());
+        }
+        j++;
     }
 
     public void readPathComplete(ClientRequest req) {
