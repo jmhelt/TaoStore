@@ -80,6 +80,9 @@ public class TaoClient implements Client {
      */
     public TaoClient() {
         try {
+            // For trace purposes
+            TaoLogger.logLevel = TaoLogger.LOG_OFF;
+
             // Initialize needed constants
             TaoConfigs.initConfiguration();
 
@@ -408,7 +411,7 @@ public class TaoClient implements Client {
                                 // Initialize ProxyResponse object based on read bytes
                                 ProxyResponse proxyResponse = mMessageCreator.createProxyResponse();
                                 proxyResponse.initFromSerialized(requestBytes);
-                                TaoLogger.logForce("Got response to request #" + proxyResponse.getClientRequestID());
+                                TaoLogger.logForce("Got proxy response #" + proxyResponse.getClientRequestID());
                                 mProfiler.onSendReadToProxyComplete(proxyResponse.getClientRequestID());
 
                                 // Get the ProxyResponse from map and initialize it
