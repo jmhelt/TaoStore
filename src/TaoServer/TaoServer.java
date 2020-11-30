@@ -372,14 +372,18 @@ public class TaoServer implements Server {
             AsynchronousServerSocketChannel channel =
                     AsynchronousServerSocketChannel.open(threadGroup).bind(new InetSocketAddress(TaoConfigs.SERVER_PORT));
 
-            channel.setOption(TCP_NODELAY, true);
-
             // Asynchronously wait for incoming connections
             channel.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {
                 @Override
                 public void completed(AsynchronousSocketChannel proxyChannel, Void att){
                     // Start listening for other connections
                     channel.accept(null, this);
+
+                    try {
+                        proxyChannel.setOption(TCP_NODELAY, true);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
                     // Start up a new thread to serve this connection
                     Runnable serializeProcedure = () -> serveProxy(proxyChannel);
