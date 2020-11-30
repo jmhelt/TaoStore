@@ -176,7 +176,7 @@ public class TaoProcessor implements Processor {
 
     @Override
     public void readPath(ClientRequest req) {
-        mProfiler.readPathStart(req);
+        //mProfiler.readPathStart(req);
 
         try {
             TaoLogger.logInfo("Starting a readPath for blockID " + req.getBlockID() + " and request #" + req.getRequestID());

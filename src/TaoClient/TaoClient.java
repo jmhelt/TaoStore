@@ -581,7 +581,7 @@ public class TaoClient implements Client {
         TaoLogger.logForce("Going to start load test");
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < LOAD_SIZE; i++) {
-            readOrWrite = r.nextInt(2);
+            readOrWrite = 0; // r.nextInt(2);
             targetBlock = r.nextInt(NUM_DATA_ITEMS) + 1;
 
             if (readOrWrite == 0) {
