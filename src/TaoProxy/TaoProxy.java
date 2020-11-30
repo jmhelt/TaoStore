@@ -321,9 +321,6 @@ public class TaoProxy implements Proxy {
             channel.read(typeByteBuffer, null, new CompletionHandler<Integer, Void>() {
                 @Override
                 public void completed(Integer result, Void attachment) {
-
-                    mProfiler.onRequestStart();
-
                     // Flip the byte buffer for reading
                     typeByteBuffer.flip();
 
@@ -359,7 +356,7 @@ public class TaoProxy implements Proxy {
                                 // Create ClientRequest object based on read bytes
                                 ClientRequest clientReq = mMessageCreator.createClientRequest();
                                 clientReq.initFromSerialized(requestBytes);
-                                //mProfiler.onRequestStart(clientReq);
+                                mProfiler.onRequestStart(clientReq);
 
                                 TaoLogger.logDebug("Proxy will handle client request #" + clientReq.getRequestID());
 

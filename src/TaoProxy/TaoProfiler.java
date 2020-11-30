@@ -3,6 +3,7 @@ package TaoProxy;
 import Configuration.TaoConfigs;
 import Messages.ClientRequest;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
@@ -14,8 +15,6 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 public class TaoProfiler implements Profiler {
 
     private long nExcludedRequests = 100;
-    private long startTime = 0;
-    private long nRequests = 0;
 
     protected String mOutputDirectory;
 
@@ -241,27 +240,24 @@ public class TaoProfiler implements Profiler {
 
     }
 
-
     @Override
-    public void onRequestStart() {
-        if (nRequests < nExcludedRequests) {
-            startTime = System.currentTimeMillis();
-            //mRequestStartTimes.put(req, System.currentTimeMillis());
+    public void onRequestStart(ClientRequest req) {
+        if (req.getRequestID() < nExcludedRequests) {
+            mRequestStartTimes.put(req, System.currentTimeMillis());
         }
-        nRequests++;
     }
 
     @Override
     public void onRequestComplete(ClientRequest req) {
-        //if (mRequestStartTimes.containsKey(req)) {
-            //long startTime = mRequestStartTimes.get(req);
-            //mRequestStartTimes.remove(req);
+        if (mRequestStartTimes.containsKey(req)) {
+            long readPathStartTime = mRequestStartTimes.get(req);
+            mRequestStartTimes.remove(req);
 
-            long totalTime = System.currentTimeMillis() - startTime;
+            long totalTime = System.currentTimeMillis() - readPathStartTime;
             synchronized (mRequestStatistics) {
                 mRequestStatistics.addValue(totalTime);
             }
-        //}
+        }
     }
 
     public void readPathStart(ClientRequest req) {
