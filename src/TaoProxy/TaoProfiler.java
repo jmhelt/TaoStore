@@ -111,6 +111,15 @@ public class TaoProfiler implements Profiler {
             report += histogramString(mRequestStatistics);
         }
 
+        // Write the report to a file
+        try {
+            PrintWriter writer = new PrintWriter(filename);
+            writer.println(report);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         filename = mOutputDirectory + "/" + "readPathStats.txt";
         synchronized (mReadPathStatistics) {
             report = mReadPathStatistics.toString();
