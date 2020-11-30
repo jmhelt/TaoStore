@@ -26,7 +26,7 @@ import static java.net.StandardSocketOptions.TCP_NODELAY;
  * @brief Class to represent a client of TaoStore
  */
 public class TaoClient implements Client {
-    private long i = 0;
+    //private long i = 0;
 
     // The address of the proxy
     protected InetSocketAddress mProxyAddress;
@@ -319,7 +319,7 @@ public class TaoClient implements Client {
             // Send message to proxy
             synchronized (mChannel) {
                 mProfiler.onSendReadToProxy(request.getRequestID());
-                TaoLogger.logForce("Sending request #" + request.getRequestID());
+                //TaoLogger.logForce("Sending request #" + request.getRequestID());
                 while (requestMessage.remaining() > 0) {
                     Future<Integer> writeResult = mChannel.write(requestMessage);
                     writeResult.get();
@@ -384,8 +384,8 @@ public class TaoClient implements Client {
             channel.read(typeByteBuffer, null, new CompletionHandler<Integer, Void>() {
                 @Override
                 public void completed(Integer result, Void attachment) {
-                    TaoLogger.logForce("Got proxy response #" + i);
-                    i++;
+                    //TaoLogger.logForce("Got proxy response #" + i);
+                    //i++;
                     // Flip the byte buffer for reading
                     typeByteBuffer.flip();
 
@@ -418,7 +418,7 @@ public class TaoClient implements Client {
                                 // Initialize ProxyResponse object based on read bytes
                                 ProxyResponse proxyResponse = mMessageCreator.createProxyResponse();
                                 proxyResponse.initFromSerialized(requestBytes);
-                                TaoLogger.logForce("Parsed proxy response #" + proxyResponse.getClientRequestID());
+                                //TaoLogger.logForce("Parsed proxy response #" + proxyResponse.getClientRequestID());
                                 mProfiler.onSendReadToProxyComplete(proxyResponse.getClientRequestID());
 
                                 // Get the ProxyResponse from map and initialize it
