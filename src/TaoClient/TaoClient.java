@@ -311,7 +311,7 @@ public class TaoClient implements Client {
             // Send message to proxy
             synchronized (mChannel) {
                 mProfiler.onSendReadToProxy(request.getRequestID());
-                TaoLogger.logDebug("Sending request #" + request.getRequestID());
+                TaoLogger.logForce("Sending request #" + request.getRequestID());
                 while (requestMessage.remaining() > 0) {
                     Future<Integer> writeResult = mChannel.write(requestMessage);
                     writeResult.get();
@@ -408,6 +408,7 @@ public class TaoClient implements Client {
                                 // Initialize ProxyResponse object based on read bytes
                                 ProxyResponse proxyResponse = mMessageCreator.createProxyResponse();
                                 proxyResponse.initFromSerialized(requestBytes);
+                                TaoLogger.logForce("Got response to request #" + proxyResponse.getClientRequestID());
                                 mProfiler.onSendReadToProxyComplete(proxyResponse.getClientRequestID());
 
                                 // Get the ProxyResponse from map and initialize it
