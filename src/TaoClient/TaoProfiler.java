@@ -12,8 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TaoProfiler implements Profiler {
 
-    private long nExcludedRequests = 100;
-
     protected String mOutputDirectory;
 
     protected Map<Long, Long> mReadStartTimes;
@@ -76,9 +74,7 @@ public class TaoProfiler implements Profiler {
 
     @Override
     public void onSendReadToProxy(long clientRequestID) {
-        if (clientRequestID >= nExcludedRequests) {
-            mReadStartTimes.put(clientRequestID, System.currentTimeMillis());
-        }
+        mReadStartTimes.put(clientRequestID, System.currentTimeMillis());
     }
 
     @Override

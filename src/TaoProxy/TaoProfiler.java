@@ -14,8 +14,6 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class TaoProfiler implements Profiler {
 
-    private long nExcludedRequests = 100;
-
     protected String mOutputDirectory;
 
     protected DescriptiveStatistics mRequestStatistics;
@@ -242,9 +240,7 @@ public class TaoProfiler implements Profiler {
 
     @Override
     public void onRequestStart(ClientRequest req) {
-        if (req.getRequestID() >= nExcludedRequests) {
-            mRequestStartTimes.put(req, System.currentTimeMillis());
-        }
+        mRequestStartTimes.put(req, System.currentTimeMillis());
     }
 
     @Override
