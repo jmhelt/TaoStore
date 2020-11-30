@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class TaoProfiler implements Profiler {
-    
+
     protected String mOutputDirectory;
 
     protected Map<ClientRequest, Long> mReadStartTimes;

@@ -548,6 +548,7 @@ public class TaoClient implements Client {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        mProfiler.writeStatistics();
     }
 
     /**
