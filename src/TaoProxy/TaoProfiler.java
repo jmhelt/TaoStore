@@ -14,6 +14,8 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class TaoProfiler implements Profiler {
 
+    protected int i = 0;
+
     protected String mOutputDirectory;
 
     protected DescriptiveStatistics mReadPathStatistics;
@@ -191,7 +193,10 @@ public class TaoProfiler implements Profiler {
     }
 
     public void readPathStart(ClientRequest req) {
-        mReadPathStartTimes.put(req, System.currentTimeMillis());
+        if (i >= 100) {
+            mReadPathStartTimes.put(req, System.currentTimeMillis());
+        }
+        i++;
     }
 
     public void readPathComplete(ClientRequest req) {
