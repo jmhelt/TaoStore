@@ -164,12 +164,13 @@ public class TaoSequencer implements Sequencer {
 
                 // Make sure only one response is sent at a time
                 synchronized (clientChannel) {
-                    TaoLogger.logForce("Proxy sending proxy response #" + response.getClientRequestID());
+                    TaoLogger.logForce("Proxy started sending proxy response #" + response.getClientRequestID());
                     // Send message
                     while (fullMessage.remaining() > 0) {
                         Future<Integer> writeResult = clientChannel.write(fullMessage);
                         writeResult.get();
                     }
+                    TaoLogger.logForce("Proxy finished sending proxy response #" + response.getClientRequestID());
 
                     // Clear buffer
                     fullMessage = null;

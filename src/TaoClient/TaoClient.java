@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * @brief Class to represent a client of TaoStore
  */
 public class TaoClient implements Client {
+    private long i = 0;
+
     // The address of the proxy
     protected InetSocketAddress mProxyAddress;
 
@@ -379,6 +381,8 @@ public class TaoClient implements Client {
             channel.read(typeByteBuffer, null, new CompletionHandler<Integer, Void>() {
                 @Override
                 public void completed(Integer result, Void attachment) {
+                    TaoLogger.logForce("Got proxy response #" + i);
+                    i++;
                     // Flip the byte buffer for reading
                     typeByteBuffer.flip();
 
@@ -411,7 +415,7 @@ public class TaoClient implements Client {
                                 // Initialize ProxyResponse object based on read bytes
                                 ProxyResponse proxyResponse = mMessageCreator.createProxyResponse();
                                 proxyResponse.initFromSerialized(requestBytes);
-                                TaoLogger.logForce("Got proxy response #" + proxyResponse.getClientRequestID());
+                                TaoLogger.logForce("Parsed proxy response #" + proxyResponse.getClientRequestID());
                                 mProfiler.onSendReadToProxyComplete(proxyResponse.getClientRequestID());
 
                                 // Get the ProxyResponse from map and initialize it
