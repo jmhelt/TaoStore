@@ -20,6 +20,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static java.net.StandardSocketOptions.TCP_NODELAY;
+
 /**
  * @brief Class to represent a client of TaoStore
  */
@@ -109,6 +111,7 @@ public class TaoClient implements Client {
                 try {
                     // Create and connect channel to proxy
                     mChannel = AsynchronousSocketChannel.open(mThreadGroup);
+                    mChannel.setOption(TCP_NODELAY, true);
                     Future connection = mChannel.connect(mProxyAddress);
                     connection.get();
                     connected = true;
