@@ -49,6 +49,9 @@ public class TaoClient implements Client {
     // ExecutorService for async reads/writes
     protected ExecutorService mExecutor;
 
+    // A Profiler to store timing information
+    protected Profiler mProfiler;
+
     /* Below static variables are used for load testing*/
 
     // Used for measuring response time
@@ -121,6 +124,8 @@ public class TaoClient implements Client {
 
             // Request ID counter
             mRequestID = new AtomicLong();
+
+            mProfiler = new TaoProfiler();
 
             // Create listener for proxy responses, wait until it is finished initializing
             Object listenerWait = new Object();
@@ -461,10 +466,12 @@ public class TaoClient implements Client {
 
             // Make request
             ClientRequest request = makeRequest(MessageTypes.CLIENT_READ_REQUEST, blockID, null, null);
-	    TaoLogger.logInfo("Doing read request #" + request.getRequestID() + " for block " + blockID);
+	        TaoLogger.logInfo("Doing read request #" + request.getRequestID() + " for block " + blockID);
 
             // Send read request
+            mProfiler.onSendReadToProxy(request);
             ProxyResponse response = sendRequestWait(request);
+            mProfiler.onSendReadToProxyComplete(request);
             return response.getReturnData();
         };
 
@@ -480,7 +487,7 @@ public class TaoClient implements Client {
 	    
             // Make request
             ClientRequest request = makeRequest(MessageTypes.CLIENT_WRITE_REQUEST, blockID, data, null);
-	    TaoLogger.logInfo("Doing write request #" + request.getRequestID() + " for block " + blockID);
+	        TaoLogger.logInfo("Doing write request #" + request.getRequestID() + " for block " + blockID);
 
             // Send write request
             ProxyResponse response = sendRequestWait(request);
