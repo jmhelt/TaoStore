@@ -242,7 +242,7 @@ public class TaoProfiler implements Profiler {
 
     @Override
     public void onRequestStart(ClientRequest req) {
-        if (req.getRequestID() < nExcludedRequests) {
+        if (req.getRequestID() >= nExcludedRequests) {
             mRequestStartTimes.put(req, System.currentTimeMillis());
         }
     }
