@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 
+import static java.net.StandardSocketOptions.TCP_NODELAY;
+
 /**
  * @brief The Sequencer makes sure that replies are sent to the client in the same order that requests were received
  */
@@ -90,6 +92,8 @@ public class TaoSequencer implements Sequencer {
             if (mChannelMap.get(req.getClientAddress()) == null || req.getRequestID() == 0) {
                 // Create channel
                 AsynchronousSocketChannel channel = AsynchronousSocketChannel.open(mThreadGroup);
+
+                channel.setOption(TCP_NODELAY, true);
 
                 // Make and wait for connection
                 Future connection = channel.connect(req.getClientAddress());
