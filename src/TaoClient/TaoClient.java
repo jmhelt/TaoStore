@@ -458,8 +458,10 @@ public class TaoClient implements Client {
     @Override
     public Future<byte[]> readAsync(long blockID) {
         Callable<byte[]> readTask = () -> {
+
             // Make request
             ClientRequest request = makeRequest(MessageTypes.CLIENT_READ_REQUEST, blockID, null, null);
+	    TaoLogger.logInfo("Doing read request #" + request.getRequestID() + " for block " + blockID);
 
             // Send read request
             ProxyResponse response = sendRequestWait(request);
@@ -474,8 +476,11 @@ public class TaoClient implements Client {
     @Override
     public Future<Boolean> writeAsync(long blockID, byte[] data) {
         Callable<Boolean> readTask = () -> {
+
+	    
             // Make request
             ClientRequest request = makeRequest(MessageTypes.CLIENT_WRITE_REQUEST, blockID, data, null);
+	    TaoLogger.logInfo("Doing write request #" + request.getRequestID() + " for block " + blockID);
 
             // Send write request
             ProxyResponse response = sendRequestWait(request);
@@ -580,7 +585,7 @@ public class TaoClient implements Client {
             targetBlock = r.nextInt(NUM_DATA_ITEMS) + 1;
 
             if (readOrWrite == 0) {
-                TaoLogger.logInfo("Doing read request #" + ((TaoClient) client).mRequestID.get() + " for block " + targetBlock);
+		//TaoLogger.logInfo("Doing read request #" + ((TaoClient) client).mRequestID.get() + " for block " + targetBlock);
 
                 // Send read and keep track of response time
                 long start = System.currentTimeMillis();
@@ -589,7 +594,7 @@ public class TaoClient implements Client {
 
 
             } else {
-                TaoLogger.logInfo("Doing write request #" + ((TaoClient) client).mRequestID.get());
+                //TaoLogger.logInfo("Doing write request #" + ((TaoClient) client).mRequestID.get());
 
                 // Send write and keep track of response time
                 long start = System.currentTimeMillis();
@@ -621,6 +626,7 @@ public class TaoClient implements Client {
         // TODO: Fix this average
         //TaoLogger.logForce("Average response time was " + average + " ms");
         TaoLogger.logForce("Test took " + (endTime - startTime) + " ms");
+        TaoLogger.logForce("Throughput: " + 1000. * LOAD_SIZE / (endTime - startTime) + " ops/s");
     }
 
     public static void loadTest(Client client) throws InterruptedException {

@@ -1,7 +1,9 @@
 package TaoProxy;
 
+import Configuration.TaoConfigs;
 import Messages.ClientRequest;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
@@ -38,7 +40,7 @@ public class TaoProfiler implements Profiler {
     protected Map<InetSocketAddress, Map<Long, Long>> mWriteBackSendToRecvTimes;
 
     public TaoProfiler() {
-        mOutputDirectory = "profile";
+        mOutputDirectory = TaoConfigs.LOG_DIRECTORY;
 
         mReadPathStatistics = new DescriptiveStatistics();
         mWriteBackStatistics = new DescriptiveStatistics();
@@ -68,7 +70,7 @@ public class TaoProfiler implements Profiler {
         String report = null;
         String filename = null;
 
-        filename = "readPathStats.txt";
+        filename = mOutputDirectory + "/" + "readPathStats.txt";
         synchronized (mReadPathStatistics) {
             report = mReadPathStatistics.toString();
         }
@@ -82,7 +84,7 @@ public class TaoProfiler implements Profiler {
         }
 
 
-        filename = "writeBackStats.txt";
+        filename = mOutputDirectory + "/" + "writeBackStats.txt";
         synchronized (mWriteBackStatistics) {
             report = mWriteBackStatistics.toString();
         }
@@ -95,7 +97,7 @@ public class TaoProfiler implements Profiler {
             e.printStackTrace();
         }
 
-        filename = "readPathSendToRecvStats.txt";
+        filename = mOutputDirectory + "/" + "readPathSendToRecvStats.txt";
         synchronized (mReadPathSendToRecvStatistics) {
             report = mReadPathSendToRecvStatistics.toString();
         }
@@ -108,7 +110,7 @@ public class TaoProfiler implements Profiler {
             e.printStackTrace();
         }
 
-        filename = "writeBackSendToRecvStats.txt";
+        filename = mOutputDirectory + "/" + "writeBackSendToRecvStats.txt";
         synchronized (mWriteBackSendToRecvStatistics) {
             report = mWriteBackSendToRecvStatistics.toString();
         }
@@ -121,7 +123,7 @@ public class TaoProfiler implements Profiler {
             e.printStackTrace();
         }
 
-        filename = "readPathServerProcessingStats.txt";
+        filename = mOutputDirectory + "/" + "readPathServerProcessingStats.txt";
         synchronized (mReadPathServerStatistics) {
             report = mReadPathServerStatistics.toString();
         }
@@ -134,7 +136,7 @@ public class TaoProfiler implements Profiler {
             e.printStackTrace();
         }
 
-        filename = "writeBackServerProcessingStats.txt";
+        filename = mOutputDirectory + "/" + "writeBackServerProcessingStats.txt";
         synchronized (mWriteBackServerStatistics) {
             report = mWriteBackServerStatistics.toString();
         }
@@ -147,7 +149,7 @@ public class TaoProfiler implements Profiler {
             e.printStackTrace();
         }
 
-        filename = "readPathNetStats.txt";
+        filename = mOutputDirectory + "/" + "readPathNetStats.txt";
         synchronized (mReadPathNetStatistics) {
             report = mReadPathNetStatistics.toString();
         }
@@ -160,7 +162,7 @@ public class TaoProfiler implements Profiler {
             e.printStackTrace();
         }
 
-        filename = "writeBackNetStats.txt";
+        filename = mOutputDirectory + "/" + "writeBackNetStats.txt";
         synchronized (mWriteBackNetStatistics) {
             report = mWriteBackNetStatistics.toString();
         }
@@ -173,7 +175,7 @@ public class TaoProfiler implements Profiler {
             e.printStackTrace();
         }
 
-        filename = "addPathStats.txt";
+        filename = mOutputDirectory + "/" + "addPathStats.txt";
         synchronized (mAddPathStatistics) {
             report = mAddPathStatistics.toString();
         }
