@@ -1,13 +1,9 @@
 package TaoClient;
 
-import Messages.ClientRequest;
-
-import java.net.InetSocketAddress;
-
 public interface Profiler {
     void writeStatistics();
 
-    void onSendReadToProxy(ClientRequest request);
+    void onSendReadToProxy(long clientRequestID);
 
-    void onSendReadToProxyComplete(ClientRequest request);
+    void onSendReadToProxyComplete(long clientRequestID);
 }

@@ -14,7 +14,7 @@ public class TaoProfiler implements Profiler {
 
     protected String mOutputDirectory;
 
-    protected Map<ClientRequest, Long> mReadStartTimes;
+    protected Map<Long, Long> mReadStartTimes;
 
     protected DescriptiveStatistics mReadStatistics;
 
@@ -73,15 +73,15 @@ public class TaoProfiler implements Profiler {
     }
 
     @Override
-    public void onSendReadToProxy(ClientRequest request) {
-        mReadStartTimes.put(request, System.currentTimeMillis());
+    public void onSendReadToProxy(long clientRequestID) {
+        mReadStartTimes.put(clientRequestID, System.currentTimeMillis());
     }
 
     @Override
-    public void onSendReadToProxyComplete(ClientRequest request) {
-        if (mReadStartTimes.containsKey(request)) {
-            long readPathStartTime = mReadStartTimes.get(request);
-            mReadStartTimes.remove(request);
+    public void onSendReadToProxyComplete(long clientRequestID) {
+        if (mReadStartTimes.containsKey(clientRequestID)) {
+            long readPathStartTime = mReadStartTimes.get(clientRequestID);
+            mReadStartTimes.remove(clientRequestID);
 
             long totalTime = System.currentTimeMillis() - readPathStartTime;
             synchronized (mReadStatistics) {
