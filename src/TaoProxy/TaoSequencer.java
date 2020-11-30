@@ -177,7 +177,7 @@ public class TaoSequencer implements Sequencer {
                     mRequestMap.remove(req);
                 }
 
-                mProfiler.readPathComplete(req);
+                mProfiler.onRequestComplete(req);
 
             } catch (Exception e) {
                 e.printStackTrace();

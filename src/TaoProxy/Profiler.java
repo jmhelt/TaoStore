@@ -7,6 +7,10 @@ import java.net.InetSocketAddress;
 public interface Profiler {
     void writeStatistics();
 
+    void onRequestStart(ClientRequest req);
+
+    void onRequestComplete(ClientRequest req);
+
     void readPathStart(ClientRequest req);
 
     void readPathComplete(ClientRequest req);

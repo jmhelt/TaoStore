@@ -26,6 +26,30 @@ public class TaoProfiler implements Profiler {
         mReadStatistics = new DescriptiveStatistics();
     }
 
+    private String histogramString(DescriptiveStatistics ds) {
+        double lastValue = -1.0;
+        int n = 0;
+
+        String hist = "Histogram:\n";
+
+        for (double value : ds.getSortedValues()) {
+            if (value != lastValue) {
+                if (lastValue != -1.0) {
+                    hist += String.format("%.2f %d\n", lastValue, n);
+                }
+                n = 0;
+                lastValue = value;
+            }
+            n++;
+        }
+
+        if (ds.getN() > 0) {
+            hist += String.format("%.2f %d\n", lastValue, n);
+        }
+
+        return hist;
+    }
+
     public void writeStatistics() {
         String report = null;
         String filename = null;
@@ -35,22 +59,8 @@ public class TaoProfiler implements Profiler {
         filename = mOutputDirectory + "/" + "clientReadStats.txt";
         synchronized (mReadStatistics) {
             report = mReadStatistics.toString();
-            report += "\nHistogram:\n";
-
-            for (double value : mReadStatistics.getSortedValues()) {
-                if (value != lastValue) {
-                    if (lastValue != -1.0) {
-                        report += String.format("%.2f %d\n", lastValue, i);
-                    }
-                    i = 0;
-                    lastValue = value;
-                }
-                i++;
-            }
-
-            if (mReadStatistics.getN() > 0) {
-                report += String.format("%.2f %d\n", lastValue, i);
-            }
+            report += "\n";
+            report += histogramString(mReadStatistics);
         }
         // Write the report to a file
         try {

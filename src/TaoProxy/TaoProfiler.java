@@ -14,9 +14,11 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class TaoProfiler implements Profiler {
 
-    protected int j = 0;
+    private long nExcludedRequests = 100;
 
     protected String mOutputDirectory;
+
+    protected DescriptiveStatistics mRequestStatistics;
 
     protected DescriptiveStatistics mReadPathStatistics;
     protected DescriptiveStatistics mWriteBackStatistics;
@@ -32,6 +34,8 @@ public class TaoProfiler implements Profiler {
 
     protected DescriptiveStatistics mAddPathStatistics;
 
+    protected Map<ClientRequest, Long> mRequestStartTimes;
+
     protected Map<ClientRequest, Long> mReadPathStartTimes;
     protected Map<Long, Long> mWriteBackStartTimes;
 
@@ -43,6 +47,8 @@ public class TaoProfiler implements Profiler {
 
     public TaoProfiler() {
         mOutputDirectory = TaoConfigs.LOG_DIRECTORY;
+
+        mRequestStatistics = new DescriptiveStatistics();
 
         mReadPathStatistics = new DescriptiveStatistics();
         mWriteBackStatistics = new DescriptiveStatistics();
@@ -58,6 +64,8 @@ public class TaoProfiler implements Profiler {
 
         mAddPathStatistics = new DescriptiveStatistics();
 
+        mRequestStartTimes = new ConcurrentHashMap<>();
+
         mReadPathStartTimes = new ConcurrentHashMap<>();
         mWriteBackStartTimes = new ConcurrentHashMap<>();
 
@@ -68,31 +76,44 @@ public class TaoProfiler implements Profiler {
         mWriteBackSendToRecvTimes = new ConcurrentHashMap<>();
     }
 
+    private String histogramString(DescriptiveStatistics ds) {
+        double lastValue = -1.0;
+        int n = 0;
+
+        String hist = "Histogram:\n";
+
+        for (double value : ds.getSortedValues()) {
+            if (value != lastValue) {
+                if (lastValue != -1.0) {
+                    hist += String.format("%.2f %d\n", lastValue, n);
+                }
+                n = 0;
+                lastValue = value;
+            }
+            n++;
+        }
+
+        if (ds.getN() > 0) {
+            hist += String.format("%.2f %d\n", lastValue, n);
+        }
+
+        return hist;
+    }
+
     public void writeStatistics() {
         String report = null;
         String filename = null;
-        double lastValue = -1.0;
-        int i = 0;
+
+        filename = mOutputDirectory + "/" + "requestStats.txt";
+        synchronized (mRequestStatistics) {
+            report = mRequestStatistics.toString();
+            report += "\n";
+            report += histogramString(mRequestStatistics);
+        }
 
         filename = mOutputDirectory + "/" + "readPathStats.txt";
         synchronized (mReadPathStatistics) {
             report = mReadPathStatistics.toString();
-            report += "\nHistogram:\n";
-
-            for (double value : mReadPathStatistics.getSortedValues()) {
-                if (value != lastValue) {
-                    if (lastValue != -1.0) {
-                        report += String.format("%.2f %d\n", lastValue, i);
-                    }
-                    i = 0;
-                    lastValue = value;
-                }
-                i++;
-            }
-
-            if (mReadPathStatistics.getN() > 0) {
-                report += String.format("%.2f %d\n", lastValue, i);
-            }
         }
         // Write the report to a file
         try {
@@ -210,15 +231,31 @@ public class TaoProfiler implements Profiler {
 
     }
 
-    public void readPathStart(ClientRequest req) {
-        if (j >= 100) {
-            mReadPathStartTimes.put(req, System.currentTimeMillis());
+    @Override
+    public void onRequestStart(ClientRequest req) {
+        if (req.getRequestID() < nExcludedRequests) {
+            mRequestStartTimes.put(req, System.currentTimeMillis());
         }
-        j++;
+    }
+
+    @Override
+    public void onRequestComplete(ClientRequest req) {
+        if (mRequestStartTimes.containsKey(req)) {
+            long readPathStartTime = mRequestStartTimes.get(req);
+            mRequestStartTimes.remove(req);
+
+            long totalTime = System.currentTimeMillis() - readPathStartTime;
+            synchronized (mRequestStatistics) {
+                mRequestStatistics.addValue(totalTime);
+            }
+        }
+    }
+
+    public void readPathStart(ClientRequest req) {
+        mReadPathStartTimes.put(req, System.currentTimeMillis());
     }
 
     public void readPathComplete(ClientRequest req) {
-
         if (mReadPathStartTimes.containsKey(req)) {
             long readPathStartTime = mReadPathStartTimes.get(req);
             mReadPathStartTimes.remove(req);

@@ -176,7 +176,7 @@ public class TaoProcessor implements Processor {
 
     @Override
     public void readPath(ClientRequest req) {
-        //mProfiler.readPathStart(req);
+        mProfiler.readPathStart(req);
 
         try {
             TaoLogger.logInfo("Starting a readPath for blockID " + req.getBlockID() + " and request #" + req.getRequestID());
@@ -346,7 +346,7 @@ public class TaoProcessor implements Processor {
                                             long serverProcessingTime = response.getProcessingTime();
                                             mProfiler.readPathServerProcessingTime(targetServer, req, serverProcessingTime);
 
-                                            //mProfiler.readPathComplete(req);
+                                            mProfiler.readPathComplete(req);
 
                                             // Send response to proxy
                                             Runnable serializeProcedure = () -> mProxy.onReceiveResponse(req, response, fakeRead);
@@ -454,7 +454,7 @@ public class TaoProcessor implements Processor {
                                                     long serverProcessingTime = response.getProcessingTime();
                                                     mProfiler.readPathServerProcessingTime(targetServer, req, serverProcessingTime);
 
-                                                    //mProfiler.readPathComplete(req);
+                                                    mProfiler.readPathComplete(req);
 
                                                     // Send response to proxy
                                                     Runnable serializeProcedure = () -> mProxy.onReceiveResponse(req, response, fakeRead);
