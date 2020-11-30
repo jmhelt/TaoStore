@@ -77,7 +77,7 @@ public class TaoProfiler implements Profiler {
         filename = mOutputDirectory + "/" + "readPathStats.txt";
         synchronized (mReadPathStatistics) {
             report = mReadPathStatistics.toString();
-            report += "\nHistogram\n";
+            report += "\nHistogram:\n";
 
             for (double value : mReadPathStatistics.getSortedValues()) {
                 if (value != lastValue) {
@@ -88,6 +88,10 @@ public class TaoProfiler implements Profiler {
                     lastValue = value;
                 }
                 i++;
+            }
+
+            if (mReadPathStatistics.getN() > 0) {
+                report += String.format("%.2f %d\n", lastValue, i);
             }
         }
         // Write the report to a file
