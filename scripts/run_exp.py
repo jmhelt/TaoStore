@@ -68,8 +68,8 @@ def generate_configs():
     configs = []
     default = {
         "config_file": DEFAULT_CONFIG,
-        "num_blocks": 1000,
-        "num_operations": 1000,
+        "num_blocks": 500,
+        "num_operations": 500,
     }
 
     # SCALABILITY
@@ -134,15 +134,27 @@ def run_exp(config):
 
     try:
         stdout, stderr = client.communicate(timeout=120)
+
+        if stdout is not None:
+            stdout = stdout.decode("utf-8")
+            with open(os.path.join(config["log_directory"], "client.log"), "w+") as f:
+                f.write(stdout)
+
     except subprocess.TimeoutExpired:
         print("Experiment failed!")
         
-    stdout = stdout.decode("utf-8")
-    with open(os.path.join(config["log_directory"], "client.log"), "w+") as f:
-              f.write(stdout)
-
     server.kill()
     proxy.kill()
+
+    if server.stdout is not None:
+        stdout = server.stdout.read().decode("utf-8")
+        with open(os.path.join(config["log_directory"], "server.log"), "w+") as f:
+            f.write(stdout)
+
+    if proxy.stdout is not None:
+        stdout = proxy.stdout.read().decode("utf-8")
+        with open(os.path.join(config["log_directory"], "proxy.log"), "w+") as f:
+            f.write(stdout)
 
 
 def run_all():
