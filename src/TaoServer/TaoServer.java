@@ -22,6 +22,8 @@ import java.util.Stack;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.net.StandardSocketOptions.TCP_NODELAY;
+
 /**
  * @brief Class to represent a server for TaoStore
  */
@@ -369,6 +371,8 @@ public class TaoServer implements Server {
             // Create a channel
             AsynchronousServerSocketChannel channel =
                     AsynchronousServerSocketChannel.open(threadGroup).bind(new InetSocketAddress(TaoConfigs.SERVER_PORT));
+
+            channel.setOption(TCP_NODELAY, true);
 
             // Asynchronously wait for incoming connections
             channel.accept(null, new CompletionHandler<AsynchronousSocketChannel, Void>() {

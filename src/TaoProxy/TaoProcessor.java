@@ -20,6 +20,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static java.net.StandardSocketOptions.TCP_NODELAY;
+
 public class TaoProcessor implements Processor {
     // Stash to hold blocks
     protected Stash mStash;
@@ -520,6 +522,7 @@ public class TaoProcessor implements Processor {
                     // Create the channels to the storage servers
                     for (int i = 0; i < numServers; i++) {
                         AsynchronousSocketChannel channel = AsynchronousSocketChannel.open(mThreadGroup);
+                        channel.setOption(TCP_NODELAY, true);
                         Future connection = channel.connect(TaoConfigs.PARTITION_SERVERS.get(i));
                         connection.get();
 
