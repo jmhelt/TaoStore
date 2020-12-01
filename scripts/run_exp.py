@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 
+import enum
 import os
 import re
 import shlex
 import subprocess
 import time
+
+
+class StorageMedia(enum.Enum):
+    MEMORY = os.path.join("/", "tmp", "oram.txt")
+    # SSD = os.path.join("/", "tmp", "oram.txt")
+    HDD = os.path.join("/", "usr", "local", "src", "TaoStore", "oram.txt")
 
 
 WD = os.path.join("/", "usr", "local", "src", "TaoStore")
@@ -70,7 +77,19 @@ def generate_configs():
         "config_file": DEFAULT_CONFIG,
         "num_blocks": 500,
         "num_operations": 500,
+        "storage": StorageMedia.HDD,
     }
+
+    # STORAGE
+    for sm in list(StorageMedia):
+        storage = default.copy()
+        storage["tag"] = "storage"
+        storage["storage"] = sm
+
+        for num_clients in [2**i for i in range(0, 5)]:
+            storage["num_clients"] = num_clients
+
+            configs.append(storage)
 
     # SCALABILITY
     for num_clients in [2**i for i in range(0, 5)]:
@@ -84,7 +103,7 @@ def generate_configs():
 
     for config in configs:
         config["log_directory"] = generate_log_dirname(config)
-    
+
     return configs
 
 
@@ -102,6 +121,7 @@ def write_config_file(config):
     field_mappings = [
         ("log_directory", "log_directory"),
         ("num_clients", "proxy_thread_count"),
+        ("storage", "oram_file"),
     ]
 
     for fm in field_mappings:
@@ -110,11 +130,11 @@ def write_config_file(config):
     log_directory = config["log_directory"]
     if not os.path.exists(log_directory):
         os.makedirs(log_directory)
-    
+
     config_filename = os.path.join(log_directory, "experiment.config")
     with open(config_filename, "w") as config_file:
         config_file.write(config_string)
-    
+
     config["config_file"] = config_filename
 
 
