@@ -10,7 +10,7 @@ import time
 
 
 class StorageMedia(enum.Enum):
-    MEMORY = os.path.join("/", "tmp", "oram.txt")
+    # MEMORY = os.path.join("/", "tmp", "oram.txt")
     # SSD = os.path.join("/", "tmp", "oram.txt")
     HDD = os.path.join("/", "usr", "local", "src", "TaoStore", "oram.txt")
 
@@ -28,8 +28,8 @@ SERVER_CLASS = "TaoServer.TaoServer"
 def parse_args():
     parser = argparse.ArgumentParser(description="Run experiments")
 
-    parser.add_argument("--pattern", "-p", type=str, required=False,
-                        help="pattern to filter experiments")
+    parser.add_argument("--patterns", "-p", type=str, required=False,
+                        help="patterns to filter experiments")
 
     return parser.parse_args()
 
@@ -92,11 +92,11 @@ def generate_configs():
 
     # STORAGE
     for sm in list(StorageMedia):
-        storage = default.copy()
-        storage["tag"] = "storage"
-        storage["storage"] = sm
-
         for num_clients in [2**i for i in range(0, 5)]:
+            storage = default.copy()
+
+            storage["tag"] = "storage"
+            storage["storage"] = sm
             storage["num_clients"] = num_clients
 
             configs.append(storage)
@@ -117,16 +117,21 @@ def generate_configs():
     return configs
 
 
-def filter_configs(configs, pattern):
+def filter_configs(configs, patterns):
     filtered = []
     if patterns:
         patterns = patterns.split("__")
 
         for config in configs:
+            match = True
             for pattern in patterns:
-                key, _, value = pattern.partition('@')
-                if key in exp and str(exp[key]) == value:
-                    filter.append(config)
+                key, _, value = pattern.partition("@")
+                if key not in config or str(config[key]) != str(value):
+                    match = False
+                    break
+
+            if match:
+                filtered.append(config)
     else:
         filtered = configs
 
@@ -207,6 +212,9 @@ def run_all(pattern):
     configs = generate_configs()
     configs = filter_configs(configs, pattern)
 
+    print(configs)
+    return
+
     for config in configs:
         run_exp(config)
 
@@ -214,7 +222,7 @@ def run_all(pattern):
 def main():
     args = parse_args()
 
-    run_all(args.pattern)
+    run_all(args.patterns)
 
 
 if __name__ == "__main__":
