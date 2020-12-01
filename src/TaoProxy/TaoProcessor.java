@@ -869,7 +869,11 @@ public class TaoProcessor implements Processor {
         // Get all the blocks from the stash and blocks from this path
         ArrayList<Block> blocksToFlush = new ArrayList<>();
         blocksToFlush.addAll(mStash.getAllBlocks());
-        Bucket[] buckets = mSubtree.getPath(pathID).getBuckets();
+        Path path = mSubtree.getPath(pathID);
+        if (path == null) {
+            throw new RuntimeException("getPath returned null for pathID: " + pathID);
+        }
+        Bucket[] buckets = path.getBuckets();
         for (Bucket b : buckets) {
             blocksToFlush.addAll(b.getFilledBlocks());
         }
