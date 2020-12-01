@@ -149,6 +149,20 @@ def replace_config_line(config_string, key, value):
                   flags=re.MULTILINE)
 
 
+def get_oram_file_path(storage_medium):
+    path = ""
+    if storage_medium == str(StorageMedia.HDD):
+        path = os.path.join("/", "usr", "local", "src", "TaoStore", "oram.txt")
+    elif storage_medium == str(StorageMedia.SSD):
+        path = os.path.join("/", "mnt", "ssd", "oram.txt")
+    elif storage_medium == str(StorageMedia.MEMORY):
+        path = os.path.join("/", "tmp", "oram.txt")
+    else:
+        raise ValueError("Unexpected StorageMedia: " + storage_medium)
+
+    return path
+
+
 def write_config_file(config):
     with open(config["config_file"], "r") as config_file:
         config_string = config_file.read()
@@ -163,17 +177,7 @@ def write_config_file(config):
     
     if "storage" in config:
         sm = config["storage"]
-        path = ""
-        if sm == str(StorageMedia.HDD):
-            path = os.path.join("/", "usr", "local", "src", "TaoStore", "oram.txt")
-        elif sm == str(StorageMedia.SSD):
-            path = os.path.join("/", "mnt", "ssd", "oram.txt")
-        elif sm == str(StorageMedia.MEMORY):
-            path = os.path.join("/", "tmp", "oram.txt")
-        else:
-            raise ValueError("Unexpected StorageMedia: " + sm)
-
-        config_string = replace_config_line(config_string, "oram_file", path)
+        config_string = replace_config_line(config_string, "oram_file", get_oram_file_path(sm))
 
     log_directory = config["log_directory"]
     if not os.path.exists(log_directory):
@@ -186,14 +190,16 @@ def write_config_file(config):
     config["config_file"] = config_filename
 
 
-def reset_state():
+def reset_state(config):
     run_sync_unchecked("killall -q java")
-    run_sync("rm -f oram.txt")
     run_sync("ant clean all")
+
+    sm = config["storage"]
+    run_sync("rm -f {}".format(get_oram_file_path(sm)))
 
 
 def run_exp(config):
-    reset_state()
+    reset_state(config)
     write_config_file(config)
 
     server = run(server_cmd(config))
