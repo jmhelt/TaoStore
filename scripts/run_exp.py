@@ -10,9 +10,12 @@ import time
 
 
 class StorageMedia(enum.Enum):
-    # MEMORY = os.path.join("/", "tmp", "oram.txt")
+    MEMORY = "memory"
     # SSD = os.path.join("/", "tmp", "oram.txt")
-    HDD = os.path.join("/", "usr", "local", "src", "TaoStore", "oram.txt")
+    HDD = "hdd" # os.path.join("/", "usr", "local", "src", "TaoStore", "oram.txt")
+
+    def __str__(self):
+        return self.value
 
 
 WD = os.path.join("/", "usr", "local", "src", "TaoStore")
@@ -29,6 +32,10 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run experiments")
 
     parser.add_argument("--patterns", "-p", type=str, required=False,
+                        help="patterns to filter experiments")
+
+    parser.add_argument("--logdir", "-l", type=str, required=False,
+                        default=os.path.join(".", "exp_data"),
                         help="patterns to filter experiments")
 
     return parser.parse_args()
@@ -70,15 +77,15 @@ def server_cmd(config):
     return cmd
 
 
-def generate_log_dirname(config):
+def generate_log_dirname(root, config):
     dirname = ""
 
-    fields = ["tag", "num_blocks", "num_operations", "num_clients"]
+    fields = ["tag", "num_blocks", "num_clients", "num_operations", "storage"]
     for field in fields:
         if field in config:
             dirname += field + "@" + str(config[field]) + "__"
 
-    return os.path.join(".", "logs", dirname[:-2])
+    return os.path.join(root, dirname[:-2])
 
 
 def generate_configs():
@@ -87,7 +94,7 @@ def generate_configs():
         "config_file": DEFAULT_CONFIG,
         "num_blocks": 500,
         "num_operations": 500,
-        "storage": StorageMedia.HDD,
+        "storage": str(StorageMedia.HDD),
     }
 
     # STORAGE
@@ -96,7 +103,7 @@ def generate_configs():
             storage = default.copy()
 
             storage["tag"] = "storage"
-            storage["storage"] = sm
+            storage["storage"] = str(sm)
             storage["num_clients"] = num_clients
 
             configs.append(storage)
@@ -110,9 +117,6 @@ def generate_configs():
 
         configs.append(scalability)
 
-
-    for config in configs:
-        config["log_directory"] = generate_log_dirname(config)
 
     return configs
 
@@ -152,11 +156,22 @@ def write_config_file(config):
     field_mappings = [
         ("log_directory", "log_directory"),
         ("num_clients", "proxy_thread_count"),
-        ("storage", "oram_file"),
     ]
 
     for fm in field_mappings:
         config_string = replace_config_line(config_string, fm[1], config[fm[0]])
+    
+    if "storage" in config:
+        sm = config["storage"]
+        path = ""
+        if sm == str(StorageMedia.HDD):
+            path = os.path.join("/", "usr", "local", "src", "TaoStore", "oram.txt")
+        elif sm == str(StorageMedia.MEMORY):
+            path = os.path.join("/", "tmp", "oram.txt")
+        else:
+            raise ValueError("Unexpected StorageMedia: " + sm)
+
+        config_string = replace_config_line(config_string, "oram_file", path)
 
     log_directory = config["log_directory"]
     if not os.path.exists(log_directory):
@@ -208,13 +223,16 @@ def run_exp(config):
             f.write(stdout)
 
 
-def run_all(pattern):
+def run_all(args):
+    # Generate configs
     configs = generate_configs()
-    configs = filter_configs(configs, pattern)
+    configs = filter_configs(configs, args.patterns)
 
-    print(configs)
-    return
+    # Generate log dir names
+    for config in configs:
+        config["log_directory"] = generate_log_dirname(args.logdir, config)
 
+    # Run experiments
     for config in configs:
         run_exp(config)
 
@@ -222,7 +240,7 @@ def run_all(pattern):
 def main():
     args = parse_args()
 
-    run_all(args.patterns)
+    run_all(args)
 
 
 if __name__ == "__main__":
