@@ -43,12 +43,6 @@ public class TaoServer implements Server {
     // We will lock at a bucket level when operating on file
     protected ReentrantLock[] mBucketLocks;
 
-    // Max threads for readPath tasks
-    public final int READ_PATH_THREADS = 1;
-    
-    // Max threads for writeBack or initialize tasks
-    public final int WRITE_BACK_THREADS = 1;
-
     // Executor for readPath tasks
     protected ExecutorService mReadPathExecutor;
 
@@ -56,7 +50,7 @@ public class TaoServer implements Server {
     protected ExecutorService mWriteBackExecutor;
 
     // read and write threads will take from a shared pool of file pointers
-    private final Semaphore mFilePointersSemaphore = new Semaphore(1);
+    private Semaphore mFilePointersSemaphore;
     
     // shared stack of file pointers
     protected Stack<RandomAccessFile> mFilePointers;
@@ -82,6 +76,14 @@ public class TaoServer implements Server {
             // Calculate the height of the tree that this particular server will store
             mServerTreeHeight = TaoConfigs.STORAGE_SERVER_TREE_HEIGHT;
 
+            // Max threads for readPath tasks
+            int readThreads = TaoConfigs.SERVER_READ_THREADS;
+
+            // Max threads for writeBack or initialize tasks
+            int writeThreads = TaoConfigs.SERVER_WRITE_THREADS;
+
+            mFilePointersSemaphore = new Semaphore(readThreads + writeThreads);
+
             // Create array that will keep track of the most recent timestamp of each bucket and the lock for each bucket
             int numBuckets = (2 << (mServerTreeHeight + 1)) - 1 ;
             mMostRecentTimestamp = new long[numBuckets];
@@ -92,15 +94,15 @@ public class TaoServer implements Server {
                 mBucketLocks[i] = new ReentrantLock();
             }
 
-            mReadPathExecutor = Executors.newFixedThreadPool(READ_PATH_THREADS);
-            mWriteBackExecutor = Executors.newFixedThreadPool(WRITE_BACK_THREADS);
+            mReadPathExecutor = Executors.newFixedThreadPool(readThreads);
+            mWriteBackExecutor = Executors.newFixedThreadPool(writeThreads);
 
             // Calculate the total amount of space the tree will use
             mServerSize = TaoConfigs.STORAGE_SERVER_SIZE;  //ServerUtility.calculateSize(mServerTreeHeight, TaoConfigs.ENCRYPTED_BUCKET_SIZE);
             
             // Initialize file pointers
             mFilePointers = new Stack<>();
-            for (int i = 0; i < WRITE_BACK_THREADS + READ_PATH_THREADS; i++) {
+            for (int i = 0; i < writeThreads + readThreads; i++) {
                 RandomAccessFile diskFile = new RandomAccessFile(TaoConfigs.ORAM_FILE, "rwd");
                 diskFile.setLength(mServerSize);
                 mFilePointers.push(diskFile);

@@ -78,6 +78,12 @@ public class TaoConfigs {
     // Port used by servers
     public static int SERVER_PORT;
 
+    // Number of server read path threads
+    public static int SERVER_READ_THREADS;
+
+    // Number of server write back threads
+    public static int SERVER_WRITE_THREADS;
+
     // The list of storage servers to be used by proxy
     public static List<InetSocketAddress> PARTITION_SERVERS = new ArrayList<>();
 
@@ -151,6 +157,14 @@ public class TaoConfigs {
                 // Assign server port number
                 String server_port = properties.getProperty("server_port");
                 SERVER_PORT = Integer.parseInt(server_port);
+
+                // Assign server read threads
+                String server_read_threads = properties.getProperty("server_read_threads");
+                SERVER_READ_THREADS = Integer.parseInt(server_read_threads);
+
+                // Assign server write threads
+                String server_write_threads = properties.getProperty("server_write_threads");
+                SERVER_WRITE_THREADS = Integer.parseInt(server_write_threads);
 
                 // Make list of all the storage servers
                 String num_storage_servers = properties.getProperty("num_storage_servers");
