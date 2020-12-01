@@ -12,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TaoProfiler implements Profiler {
 
+    private long nExcluded = 1000;
+
     protected String mOutputDirectory;
 
     protected Map<Long, Long> mReadStartTimes;
@@ -51,10 +53,8 @@ public class TaoProfiler implements Profiler {
     }
 
     public void writeStatistics() {
-        String report = null;
-        String filename = null;
-        double lastValue = -1.0;
-        int i = 0;
+        String report;
+        String filename;
 
         filename = mOutputDirectory + "/" + "clientReadStats.txt";
         synchronized (mReadStatistics) {
@@ -74,12 +74,14 @@ public class TaoProfiler implements Profiler {
 
     @Override
     public void onSendReadToProxy(long clientRequestID) {
-        mReadStartTimes.put(clientRequestID, System.currentTimeMillis());
+        if (clientRequestID >= nExcluded) {
+            mReadStartTimes.put(clientRequestID, System.currentTimeMillis());
+        }
     }
 
     @Override
     public void onSendReadToProxyComplete(long clientRequestID) {
-        if (mReadStartTimes.containsKey(clientRequestID)) {
+        if (clientRequestID >= nExcluded && mReadStartTimes.containsKey(clientRequestID)) {
             long readPathStartTime = mReadStartTimes.get(clientRequestID);
             mReadStartTimes.remove(clientRequestID);
 
