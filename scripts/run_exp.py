@@ -11,8 +11,8 @@ import time
 
 class StorageMedia(enum.Enum):
     MEMORY = "memory"
-    # SSD = os.path.join("/", "tmp", "oram.txt")
-    HDD = "hdd" # os.path.join("/", "usr", "local", "src", "TaoStore", "oram.txt")
+    SSD = "ssd"
+    HDD = "hdd"
 
     def __str__(self):
         return self.value
@@ -92,8 +92,8 @@ def generate_configs():
     configs = []
     default = {
         "config_file": DEFAULT_CONFIG,
-        "num_blocks": 500,
-        "num_operations": 500,
+        "num_blocks": 1000,
+        "num_operations": 1000,
         "storage": str(StorageMedia.HDD),
     }
 
@@ -166,6 +166,8 @@ def write_config_file(config):
         path = ""
         if sm == str(StorageMedia.HDD):
             path = os.path.join("/", "usr", "local", "src", "TaoStore", "oram.txt")
+        elif sm == str(StorageMedia.SSD):
+            path = os.path.join("/", "mnt", "ssd", "oram.txt")
         elif sm == str(StorageMedia.MEMORY):
             path = os.path.join("/", "tmp", "oram.txt")
         else:
@@ -199,7 +201,7 @@ def run_exp(config):
     client = run(client_cmd(config))
 
     try:
-        stdout, stderr = client.communicate(timeout=120)
+        stdout, stderr = client.communicate(timeout=240)
 
         if stdout is not None:
             stdout = stdout.decode("utf-8")
