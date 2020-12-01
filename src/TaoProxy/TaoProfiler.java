@@ -14,6 +14,8 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class TaoProfiler implements Profiler {
 
+    private long nExcluded = 1000;
+
     protected String mOutputDirectory;
 
     protected DescriptiveStatistics mRequestStatistics;
@@ -240,12 +242,14 @@ public class TaoProfiler implements Profiler {
 
     @Override
     public void onRequestStart(ClientRequest req) {
-        mRequestStartTimes.put(req, System.currentTimeMillis());
+        if (req.getRequestID() >= nExcluded) {
+            mRequestStartTimes.put(req, System.currentTimeMillis());
+        }
     }
 
     @Override
     public void onRequestComplete(ClientRequest req) {
-        if (mRequestStartTimes.containsKey(req)) {
+        if (req.getRequestID() >= nExcluded && mRequestStartTimes.containsKey(req)) {
             long readPathStartTime = mRequestStartTimes.get(req);
             mRequestStartTimes.remove(req);
 
@@ -257,11 +261,13 @@ public class TaoProfiler implements Profiler {
     }
 
     public void readPathStart(ClientRequest req) {
-        mReadPathStartTimes.put(req, System.currentTimeMillis());
+        if (req.getRequestID() >= nExcluded) {
+            mReadPathStartTimes.put(req, System.currentTimeMillis());
+        }
     }
 
     public void readPathComplete(ClientRequest req) {
-        if (mReadPathStartTimes.containsKey(req)) {
+        if (req.getRequestID() >= nExcluded && mReadPathStartTimes.containsKey(req)) {
             long readPathStartTime = mReadPathStartTimes.get(req);
             mReadPathStartTimes.remove(req);
 
