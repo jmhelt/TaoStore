@@ -80,7 +80,9 @@ def server_cmd(config):
 def generate_log_dirname(root, config):
     dirname = ""
 
-    fields = ["tag", "num_blocks", "num_clients", "num_operations", "storage"]
+    fields = ["tag", "num_blocks", "num_clients", "num_operations",
+              "server_readers", "server_writers", "storage"]
+
     for field in fields:
         if field in config:
             dirname += field + "@" + str(config[field]) + "__"
@@ -95,6 +97,8 @@ def generate_configs():
         "num_blocks": 1000,
         "num_operations": 1000,
         "storage": str(StorageMedia.HDD),
+        "server_readers": 1,
+        "server_writers": 1,
     }
 
     # STORAGE
@@ -108,15 +112,29 @@ def generate_configs():
 
             configs.append(storage)
 
-    # SCALABILITY
-    for num_clients in [2**i for i in range(0, 5)]:
-        scalability = default.copy()
+    # SERVER_READERS
+    for num_readers in [2**i for i in range(0, 3)]:
+        for num_clients in [2**i for i in range(0, 5)]:
+            readers = default.copy()
 
-        scalability["tag"] = "scalability"
-        scalability["num_clients"] = num_clients
+            readers["tag"] = "server_readers"
+            readers["storage"] = str(StorageMedia.MEMORY)
+            readers["num_clients"] = num_clients
+            readers["server_readers"] = num_readers
 
-        configs.append(scalability)
+            configs.append(readers)
 
+    # SERVER_WRITERS
+    for num_writers in [2**i for i in range(0, 3)]:
+        for num_clients in [2**i for i in range(0, 5)]:
+            writers = default.copy()
+
+            writers["tag"] = "server_writers"
+            writers["storage"] = str(StorageMedia.MEMORY)
+            writers["num_clients"] = num_clients
+            writers["server_writers"] = num_writers
+
+            configs.append(writers)
 
     return configs
 
@@ -170,11 +188,13 @@ def write_config_file(config):
     field_mappings = [
         ("log_directory", "log_directory"),
         ("num_clients", "proxy_thread_count"),
+        ("server_readers", "server_read_threads"),
+        ("server_writers", "server_write_threads"),
     ]
 
     for fm in field_mappings:
         config_string = replace_config_line(config_string, fm[1], config[fm[0]])
-    
+
     if "storage" in config:
         sm = config["storage"]
         config_string = replace_config_line(config_string, "oram_file", get_oram_file_path(sm))
