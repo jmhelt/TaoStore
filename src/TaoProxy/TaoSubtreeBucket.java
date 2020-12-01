@@ -117,12 +117,12 @@ public class TaoSubtreeBucket extends TaoBucket implements SubtreeBucket {
     @Override
     public void print() {
         List<Block> bs = getFilledBlocks();
-        TaoLogger.logForce("Bucket start --------------------");
-        TaoLogger.logForce("At level " + mLevel);
-        TaoLogger.logForce("Last updated at " + getUpdateTime());
+        TaoLogger.logDebug("Bucket start --------------------");
+        TaoLogger.logDebug("At level " + mLevel);
+        TaoLogger.logDebug("Last updated at " + getUpdateTime());
         for (int i = 0; i < bs.size(); i++) {
-            TaoLogger.logForce("@@@ BlockID: " + bs.get(i).getBlockID());
+            TaoLogger.logDebug("@@@ BlockID: " + bs.get(i).getBlockID());
         }
-        TaoLogger.logForce("Bucket end --------------------\n");
+        TaoLogger.logDebug("Bucket end --------------------\n");
     }
 }
