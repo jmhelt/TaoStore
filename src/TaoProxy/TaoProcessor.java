@@ -785,8 +785,8 @@ public class TaoProcessor implements Processor {
         // Get path that will be flushed
         Path pathToFlush = mSubtree.getPath(pathID);
 
-
         if (pathToFlush == null) {
+            System.out.println("pathToFlush==null pathID: " + pathID);
             mSubtreeRWL.readLock().unlock();
             return;
         }

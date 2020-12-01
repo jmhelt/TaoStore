@@ -11,7 +11,7 @@ public class TaoSubtreeBucket extends TaoBucket implements SubtreeBucket {
     private SubtreeBucket mRight;
 
     // The level this bucket resides, used for debugging
-    private int mLevel;
+    public int mLevel;
 
     /**
      * @brief Default constructor
