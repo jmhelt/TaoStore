@@ -167,6 +167,7 @@ public class TaoSubtree implements Subtree {
 
     @Override
     public void addPath(Path path) {
+        System.out.println("Going to add pathid " + path.getPathID());
         TaoLogger.logDebug("Going to add pathid " + path.getPathID() + " to subtree");
 
         // Boolean to keep track of if a bucket was added to the current level
@@ -409,6 +410,7 @@ public class TaoSubtree implements Subtree {
 
     @Override
     public void deleteNodes(long pathID, long minTime, Set<Long> pathReqMultiSet) {
+        System.out.println("Doing a delete on pathID: " + pathID);
         TaoLogger.logInfo("Doing a delete on pathID: " + pathID + " and min time " + minTime);
 
         // Check if subtree is empty
