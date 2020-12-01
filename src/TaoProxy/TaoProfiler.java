@@ -301,18 +301,20 @@ public class TaoProfiler implements Profiler {
     }
 
     public void readPathServerProcessingTime(InetSocketAddress address, ClientRequest req, long processingTime) {
-        Map<ClientRequest, Long> readPathSendToRecvTimesForServer = mReadPathSendToRecvTimes.get(address);
-        long t2 = readPathSendToRecvTimesForServer.get(req);
-        long netTimeApprox = t2 - processingTime;
+        if (req.getRequestID() >= nExcluded) {
+            Map<ClientRequest, Long> readPathSendToRecvTimesForServer = mReadPathSendToRecvTimes.get(address);
+            long t2 = readPathSendToRecvTimesForServer.get(req);
+            long netTimeApprox = t2 - processingTime;
 
-        //TaoLogger.logForce("readPathNet time (" + address + ", " + req.getRequestID() + "): " + netTimeApprox);
+            //TaoLogger.logForce("readPathNet time (" + address + ", " + req.getRequestID() + "): " + netTimeApprox);
 
-        synchronized (mReadPathServerStatistics) {
-            mReadPathServerStatistics.addValue(processingTime);
-        }
+            synchronized (mReadPathServerStatistics) {
+                mReadPathServerStatistics.addValue(processingTime);
+            }
 
-        synchronized (mReadPathNetStatistics) {
-            mReadPathNetStatistics.addValue(netTimeApprox);
+            synchronized (mReadPathNetStatistics) {
+                mReadPathNetStatistics.addValue(netTimeApprox);
+            }
         }
     }
 
