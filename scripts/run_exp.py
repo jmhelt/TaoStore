@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import enum
 import os
 import re
@@ -22,6 +23,15 @@ BASE_CMD = "java --class-path ./out/production/TaoStore:./libs/guava-19.0.jar:./
 CLIENT_CLASS = "TaoClient.TaoClient"
 PROXY_CLASS = "TaoProxy.TaoProxy"
 SERVER_CLASS = "TaoServer.TaoServer"
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Run experiments")
+
+    parser.add_argument("--pattern", "-p", type=str, required=False,
+                        help="pattern to filter experiments")
+
+    return parser.parse_args()
 
 
 def run_sync(cmd):
@@ -107,6 +117,22 @@ def generate_configs():
     return configs
 
 
+def filter_configs(configs, pattern):
+    filtered = []
+    if patterns:
+        patterns = patterns.split("__")
+
+        for config in configs:
+            for pattern in patterns:
+                key, _, value = pattern.partition('@')
+                if key in exp and str(exp[key]) == value:
+                    filter.append(config)
+    else:
+        filtered = configs
+
+    return filtered
+
+
 def replace_config_line(config_string, key, value):
     return re.sub("{}=.*$".format(key),
                   "{}={}\n".format(key, value),
@@ -162,7 +188,7 @@ def run_exp(config):
 
     except subprocess.TimeoutExpired:
         print("Experiment failed!")
-        
+
     server.kill()
     proxy.kill()
 
@@ -177,15 +203,18 @@ def run_exp(config):
             f.write(stdout)
 
 
-def run_all():
+def run_all(pattern):
     configs = generate_configs()
+    configs = filter_configs(configs, pattern)
 
     for config in configs:
         run_exp(config)
 
 
 def main():
-    run_all()
+    args = parse_args()
+
+    run_all(args.pattern)
 
 
 if __name__ == "__main__":
