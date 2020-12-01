@@ -242,18 +242,24 @@ public class TaoSubtree implements Subtree {
 
         // Keep track of current bucket
         SubtreeBucket currentBucket = mRoot;
+        SubtreeBucket previousBucket = null;
 
         if (mRoot == null) {
+            System.out.println("root is null!");
             return null;
         }
 
         // Visit each level of path
         for (Boolean right : pathDirection) {
             // Get either the right or left child depending on the path
+            previousBucket = currentBucket;
             currentBucket = right ? currentBucket.getRight() : currentBucket.getLeft();
 
             // If the path is null at some level, we return null
             if (currentBucket == null) {
+                System.out.println("currentBucket is null. Printing parent:");
+                System.out.println("right: " + right);
+                previousBucket.print();
                 return null;
             }
 
