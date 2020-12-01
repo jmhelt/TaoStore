@@ -36,7 +36,7 @@ p <- ggplot(data, aes(x = num_clients, y = throughput, color = storage)) +
     geom_point(size = 3) +
     geom_line(size = 2) +
     scale_x_continuous(
-        limits = c(0.9, 17),
+        limits = c(1, 16.5),
         breaks = c(1, 2, 4, 8, 16),
         expand = c(0, 0)
     ) +
@@ -44,6 +44,7 @@ p <- ggplot(data, aes(x = num_clients, y = throughput, color = storage)) +
         trans = "log10",
         limits = c(10, 1100),
         breaks = c(10, 50, 100, 500, 1000),
+        labels = comma,
         expand = c(0, 0)
     ) +
     labs(
