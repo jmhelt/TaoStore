@@ -102,6 +102,7 @@ public class TaoSubtree implements Subtree {
                 // Once we acquire the lock, we make sure that another thread hasn't already initialized the root
                 if (mRoot == null) {
                     mRoot = new TaoSubtreeBucket(path.getBucket(0));
+                    System.out.println("added root: " + mRoot.getID());
                     added = true;
                 }
             }
@@ -177,6 +178,7 @@ public class TaoSubtree implements Subtree {
         if (mRoot == null) {
             // If empty, initialize root with root of given path
             mRoot = new TaoSubtreeBucket(path.getBucket(0));
+            System.out.println("added root: " + mRoot.getID());
             added = true;
         }
 
@@ -434,6 +436,7 @@ public class TaoSubtree implements Subtree {
         // thus it should be okay to set mRoot to null
         if (mRoot.getUpdateTime() <= minTime && !pathReqMultiSet.contains(pathID) && 0 > lastLevelToSave) {
             TaoLogger.logDebug("** Deleting the root node too");
+            System.out.println("Deleting root node: " + mRoot.getID());
             mRoot = null;
         } else {
             TaoLogger.logDebug("** Not deleting root node");
