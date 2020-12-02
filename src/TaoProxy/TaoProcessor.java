@@ -814,6 +814,10 @@ public class TaoProcessor implements Processor {
             System.out.println("subtrees: " + temp1 + " " + temp2);
             System.out.println("Buckets in pathToFlush:");
             for (Bucket b : pathToFlush.getBuckets()) {
+                System.out.println(b + " " + b.getID() + " blocks:");
+                for (Block block : b.getBlocks()) {
+                    System.out.println(mSubtree.getBucketWithBlock(block.getBlockID()));
+                }
                 System.out.println(b.getID());
             }
             throw new RuntimeException("removeBucketMapping called with null: " + pathID);
