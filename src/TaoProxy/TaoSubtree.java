@@ -449,16 +449,72 @@ public class TaoSubtree implements Subtree {
     }
 
     @Override
-    public boolean clearPath(long pathID, Path path) {
+    public boolean clearPath(long pathID) {
+        //System.out.println("clearing path: " + pathID);
         if (mRoot == null) {
             return true;
         }
+        boolean[] pathDirection = Utility.getPathFromPID(pathID, TaoConfigs.TREE_HEIGHT);
 
-        for (Bucket bucket : path.getBuckets()) {
-            SubtreeBucket currentBucket = (SubtreeBucket)bucket;
+        // Keep track of current bucket
+        SubtreeBucket currentBucket = mRoot;
+        SubtreeBucket previousBucket = null;
+
+        int i = 0;
+        for (Boolean right : pathDirection) {
+            // Remove all block mappings to this bucket and clear the bucket
+            if (currentBucket == null) {
+                if (right) {
+                    System.out.println("clearPath: right child of bucket " + previousBucket.getID() + " is null: " + pathID);
+                } else {
+                    System.out.println("clearPath: left child of bucket " + previousBucket.getID() + " is null: " + pathID);
+                }
+
+                System.out.println("Printing path:");
+                SubtreeBucket cur = mRoot;
+                for (int j = 0; j < i; j++) {
+                    boolean r = pathDirection[j];
+
+                    System.out.println(cur.getID());
+
+                    if (r) {
+                        cur = cur.getRight();
+                    } else {
+                        cur = cur.getLeft();
+                    }
+
+                }
+                return false;
+            }
             removeBucketMapping(currentBucket);
             currentBucket.clearBucket();
+
+            // Determine whether the path is turning left or right from current bucket
+            if (right) {
+                // Move to next bucket
+                previousBucket = currentBucket;
+                currentBucket = currentBucket.getRight();
+            } else {
+                // Move to next bucket
+                previousBucket = currentBucket;
+                currentBucket = currentBucket.getLeft();
+            }
+            i++;
         }
+
+        if (currentBucket == null) {
+            return false;
+        }
+
+        // Remove all block mappings to this bucket and clear the bucket
+        removeBucketMapping(currentBucket);
+
+        for (Block b : currentBucket.getFilledBlocks()) {
+            TaoLogger.logBlock(b.getBlockID(), "subtree remove");
+        }
+
+        // Clear bucket of blocks
+        currentBucket.clearBucket();
 
         return true;
     }

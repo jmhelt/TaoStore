@@ -798,11 +798,18 @@ public class TaoProcessor implements Processor {
         pathToFlush.lockPath();
 
         // Get a heap based on the block's path ID when compared to the target path ID
-        PriorityQueue<Block> blockHeap = getHeap(pathID, pathToFlush);
+        PriorityQueue<Block> blockHeap = getHeap(pathID);
+        if (blockHeap == null) {
+            System.out.println("Buckets in pathToFlush:");
+            for (Bucket b : pathToFlush.getBuckets()) {
+                System.out.println(b.getID());
+            }
+            throw new RuntimeException("getPath returned null for pathID: " + pathID);
+        }
 
         // Clear path
         Subtree temp2 = mSubtree;
-        boolean success = mSubtree.clearPath(pathID, pathToFlush);
+        boolean success = mSubtree.clearPath(pathID);
         if (!success) {
             System.out.println("subtrees: " + temp1 + " " + temp2);
             System.out.println("Buckets in pathToFlush:");
@@ -880,7 +887,11 @@ public class TaoProcessor implements Processor {
      * @param pathID
      * @return max heap based on each block's path id when compared to the passed in pathID
      */
-    public PriorityQueue<Block> getHeap(long pathID, Path path) {
+    public PriorityQueue<Block> getHeap(long pathID) {
+        Path path = mSubtree.getPath(pathID);
+        if (path == null) {
+            return null;
+        }
         // Get all the blocks from the stash and blocks from this path
         ArrayList<Block> blocksToFlush = new ArrayList<>();
         blocksToFlush.addAll(mStash.getAllBlocks());
