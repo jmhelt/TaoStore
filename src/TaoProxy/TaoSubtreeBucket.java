@@ -83,10 +83,15 @@ public class TaoSubtreeBucket extends TaoBucket implements SubtreeBucket {
 
     @Override
     public boolean setRight(Bucket b, int level, int caller) {
-        if (b == null) {
-            System.out.println("setRight null for bucket: " + getID() + " caller: " + caller);
+        mRWL.writeLock().lock();
+        try {
+            if (b == null) {
+                System.out.println("setRight null for bucket: " + getID() + " caller: " + caller);
+            }
+            return setRight(b, level);
+        } finally {
+            mRWL.writeLock().unlock();
         }
-        return setRight(b, level);
     }
 
     @Override
@@ -114,10 +119,15 @@ public class TaoSubtreeBucket extends TaoBucket implements SubtreeBucket {
 
     @Override
     public boolean setLeft(Bucket b, int level, int caller) {
-        if (b == null) {
-            System.out.println("setLeft null for bucket: " + getID() + " caller: " + caller);
+        mRWL.writeLock().lock();
+        try {
+            if (b == null) {
+                System.out.println("setLeft null for bucket: " + getID() + " caller: " + caller);
+            }
+            return setLeft(b, level);
+        } finally {
+            mRWL.writeLock().unlock();
         }
-        return setLeft(b, level);
     }
 
     @Override

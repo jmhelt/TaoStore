@@ -29,7 +29,7 @@ public class TaoBucket implements Bucket {
     private int mBucketBitmap;
 
     // Read-write lock for bucket
-    private final ReentrantReadWriteLock mRWL = new ReentrantReadWriteLock();
+    protected final ReentrantReadWriteLock mRWL = new ReentrantReadWriteLock();
 
     /**
      * @brief Default constructor
