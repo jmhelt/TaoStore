@@ -64,8 +64,8 @@ public class TaoSubtree implements Subtree {
      */
     private void recursivePreorderInit(SubtreeBucket b, int level) {
         // Set the left and right child
-        b.setRight(new TaoSubtreeBucket(), level);
-        b.setLeft(new TaoSubtreeBucket(), level);
+        b.setRight(new TaoSubtreeBucket(), level, 0);
+        b.setLeft(new TaoSubtreeBucket(), level, 0);
 
         // Increase level
         level++;
@@ -130,7 +130,7 @@ public class TaoSubtree implements Subtree {
             // Determine whether the path is turning left or right from current bucket
             if (right) {
                 // Attempt to initialize right bucket
-                added = currentBucket.setRight(path.getBucket(bucketLevel), bucketLevel);
+                added = currentBucket.setRight(path.getBucket(bucketLevel), bucketLevel, 1);
                 currentBucket.getRight().setUpdateTime(timestamp);
 
                 // If we initialized the child, we should add the blocks to the block map
@@ -145,7 +145,7 @@ public class TaoSubtree implements Subtree {
                 currentBucket = currentBucket.getRight();
             } else {
                 // Attempt to initialize left bucket
-                added = currentBucket.setLeft(path.getBucket(bucketLevel), bucketLevel);
+                added = currentBucket.setLeft(path.getBucket(bucketLevel), bucketLevel, 1);
                 currentBucket.getLeft().setUpdateTime(timestamp);
 
                 // If we initialized the child, we should add the blocks to the block map
@@ -200,7 +200,7 @@ public class TaoSubtree implements Subtree {
             // Determine whether the path is turning left or right from current bucket
             if (right) {
                 // Attempt to initialize right bucket
-                added = currentBucket.setRight(path.getBucket(bucketLevel), bucketLevel);
+                added = currentBucket.setRight(path.getBucket(bucketLevel), bucketLevel, 2);
 
                 // If we initialized the child, we should add the blocks to the block map
                 if (added) {
@@ -213,7 +213,7 @@ public class TaoSubtree implements Subtree {
                 currentBucket = currentBucket.getRight();
             } else {
                 // Attempt to initialize left bucket
-                added = currentBucket.setLeft(path.getBucket(bucketLevel), bucketLevel);
+                added = currentBucket.setLeft(path.getBucket(bucketLevel), bucketLevel, 2);
 
                 // If we initialized the child, we should add the blocks to the block map
                 if (added) {
@@ -372,14 +372,14 @@ public class TaoSubtree implements Subtree {
                     TaoLogger.logBlock(b.getBlockID(), "subtree remove");
                 }
                 removeBucketMapping(child);
-                bucket.setRight(null, currentLevel);
+                bucket.setRight(null, currentLevel, 3);
             } else {
                 TaoLogger.logDebug("Going to delete the left child for path " + pathID + " at level " + parentLevel);
                 for (Block b : child.getFilledBlocks()) {
                     TaoLogger.logBlock(b.getBlockID(), "subtree remove");
                 }
                 removeBucketMapping(child);
-                bucket.setLeft(null, currentLevel);
+                bucket.setLeft(null, currentLevel, 3);
             }
         } else {
             TaoLogger.logDebug("Not going to delete the node at level " + currentLevel + " because...");
@@ -414,7 +414,7 @@ public class TaoSubtree implements Subtree {
 
     @Override
     public void deleteNodes(long pathID, long minTime, Set<Long> pathReqMultiSet) {
-        System.out.println("Doing a delete on pathID: " + pathID);
+        //System.out.println("Doing a delete on pathID: " + pathID);
         TaoLogger.logInfo("Doing a delete on pathID: " + pathID + " and min time " + minTime);
 
         // Check if subtree is empty
@@ -447,7 +447,7 @@ public class TaoSubtree implements Subtree {
 
     @Override
     public void clearPath(long pathID) {
-        System.out.println("clearing path: " + pathID);
+        //System.out.println("clearing path: " + pathID);
         if (mRoot == null) {
             return;
         }

@@ -10,12 +10,14 @@ public interface SubtreeBucket extends Bucket {
      * @return if something was set or not
      */
     boolean setRight(Bucket b, int level);
+    boolean setRight(Bucket b, int level, int caller);
 
     /**
      * @brief Set the left child of this Subtree bucket
      * @param b
      */
     boolean setLeft(Bucket b, int level);
+    boolean setLeft(Bucket b, int level, int caller);
 
     /**
      * @brief Accessor method to get the right child of this bucket
