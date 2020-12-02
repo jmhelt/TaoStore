@@ -452,7 +452,7 @@ public class TaoSubtree implements Subtree {
     public boolean clearPath(long pathID) {
         //System.out.println("clearing path: " + pathID);
         if (mRoot == null) {
-            return true;
+            return false;
         }
         boolean[] pathDirection = Utility.getPathFromPID(pathID, TaoConfigs.TREE_HEIGHT);
 

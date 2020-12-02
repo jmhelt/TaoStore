@@ -800,27 +800,22 @@ public class TaoProcessor implements Processor {
         // Get a heap based on the block's path ID when compared to the target path ID
         PriorityQueue<Block> blockHeap = getHeap(pathID, pathToFlush);
         if (blockHeap == null) {
-            System.out.println("Buckets in pathToFlush:");
-            for (Bucket b : pathToFlush.getBuckets()) {
-                System.out.println(b.getID());
-            }
-            throw new RuntimeException("getPath returned null for pathID: " + pathID);
+            pathToFlush.unlockPath();
+            mSubtreeRWL.readLock().unlock();
+            return;
+//            System.out.println("Buckets in pathToFlush:");
+//            for (Bucket b : pathToFlush.getBuckets()) {
+//                System.out.println(b.getID());
+//            }
+//            throw new RuntimeException("getPath returned null for pathID: " + pathID);
         }
 
         // Clear path
         Subtree temp2 = mSubtree;
-        boolean success = mSubtree.clearPath(pathID);
-        if (!success) {
-            System.out.println("subtrees: " + temp1 + " " + temp2);
-            System.out.println("Buckets in pathToFlush:");
-            for (Bucket b : pathToFlush.getBuckets()) {
-                System.out.println(b + " " + b.getID() + " blocks:");
-                for (Block block : b.getBlocks()) {
-                    System.out.println(mSubtree.getBucketWithBlock(block.getBlockID()));
-                }
-                System.out.println(b.getID());
-            }
-            throw new RuntimeException("removeBucketMapping called with null: " + pathID);
+        if (!mSubtree.clearPath(pathID)) {
+            pathToFlush.unlockPath();
+            mSubtreeRWL.readLock().unlock();
+            return;
         }
 
         // Variables to help with flushing path
