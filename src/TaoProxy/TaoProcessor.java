@@ -783,7 +783,9 @@ public class TaoProcessor implements Processor {
 
 
         // Get path that will be flushed
+        Subtree temp1 = mSubtree;
         Path pathToFlush = mSubtree.getPath(pathID);
+
         //System.out.println("got non-null pathToFlush pathID: " + pathID);
         if (pathToFlush == null) {
             System.out.println("pathToFlush==null pathID: " + pathID);
@@ -806,8 +808,10 @@ public class TaoProcessor implements Processor {
         }
 
         // Clear path
+        Subtree temp2 = mSubtree;
         boolean success = mSubtree.clearPath(pathID);
         if (!success) {
+            System.out.println("subtrees: " + temp1 + " " + temp2);
             System.out.println("Buckets in pathToFlush:");
             for (Bucket b : pathToFlush.getBuckets()) {
                 System.out.println(b.getID());
