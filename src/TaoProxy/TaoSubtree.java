@@ -457,6 +457,7 @@ public class TaoSubtree implements Subtree {
         SubtreeBucket currentBucket = mRoot;
         SubtreeBucket previousBucket = null;
 
+        int i = 0;
         for (Boolean right : pathDirection) {
             // Remove all block mappings to this bucket and clear the bucket
             if (currentBucket == null) {
@@ -464,6 +465,21 @@ public class TaoSubtree implements Subtree {
                     System.out.println("clearPath: right child of bucket " + previousBucket.getID() + " is null: " + pathID);
                 } else {
                     System.out.println("clearPath: left child of bucket " + previousBucket.getID() + " is null: " + pathID);
+                }
+
+                System.out.println("Printing path:");
+                SubtreeBucket cur = mRoot;
+                for (int j = 0; j < i; j++) {
+                    boolean r = pathDirection[j];
+
+                    System.out.println(cur.getID());
+
+                    if (r) {
+                        cur = cur.getRight();
+                    } else {
+                        cur = cur.getLeft();
+                    }
+
                 }
                 return false;
             }
@@ -480,6 +496,7 @@ public class TaoSubtree implements Subtree {
                 previousBucket = currentBucket;
                 currentBucket = currentBucket.getLeft();
             }
+            i++;
         }
 
         if (currentBucket == null) {
