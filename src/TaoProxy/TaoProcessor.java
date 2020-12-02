@@ -798,7 +798,7 @@ public class TaoProcessor implements Processor {
         pathToFlush.lockPath();
 
         // Get a heap based on the block's path ID when compared to the target path ID
-        PriorityQueue<Block> blockHeap = getHeap(pathID);
+        PriorityQueue<Block> blockHeap = getHeap(pathID, pathToFlush);
         if (blockHeap == null) {
             System.out.println("Buckets in pathToFlush:");
             for (Bucket b : pathToFlush.getBuckets()) {
@@ -887,8 +887,7 @@ public class TaoProcessor implements Processor {
      * @param pathID
      * @return max heap based on each block's path id when compared to the passed in pathID
      */
-    public PriorityQueue<Block> getHeap(long pathID) {
-        Path path = mSubtree.getPath(pathID);
+    public PriorityQueue<Block> getHeap(long pathID, Path path) {
         if (path == null) {
             return null;
         }
