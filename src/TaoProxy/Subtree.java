@@ -50,7 +50,7 @@ public interface Subtree {
      * @brief Method to clear out a path
      * @param pathID
      */
-    void clearPath(long pathID);
+    boolean clearPath(long pathID);
 
     /**
      * @brief Used for debugging, prints subtree contents

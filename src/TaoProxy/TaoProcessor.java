@@ -806,7 +806,14 @@ public class TaoProcessor implements Processor {
         }
 
         // Clear path
-        mSubtree.clearPath(pathID);
+        boolean success = mSubtree.clearPath(pathID);
+        if (!success) {
+            System.out.println("Buckets in pathToFlush:");
+            for (Bucket b : pathToFlush.getBuckets()) {
+                System.out.println(b.getID());
+            }
+            throw new RuntimeException("removeBucketMapping called with null: " + pathID);
+        }
 
         // Variables to help with flushing path
         Block currentBlock;

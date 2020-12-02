@@ -446,10 +446,10 @@ public class TaoSubtree implements Subtree {
     }
 
     @Override
-    public void clearPath(long pathID) {
+    public boolean clearPath(long pathID) {
         //System.out.println("clearing path: " + pathID);
         if (mRoot == null) {
-            return;
+            return true;
         }
         boolean[] pathDirection = Utility.getPathFromPID(pathID, TaoConfigs.TREE_HEIGHT);
 
@@ -465,7 +465,7 @@ public class TaoSubtree implements Subtree {
                 } else {
                     System.out.println("clearPath: left child of bucket " + previousBucket.getID() + " is null: " + pathID);
                 }
-                throw new RuntimeException("removeBucketMapping called with null: " + pathID);
+                return false;
             }
             removeBucketMapping(currentBucket);
             currentBucket.clearBucket();
@@ -483,7 +483,7 @@ public class TaoSubtree implements Subtree {
         }
 
         if (currentBucket == null) {
-            throw new RuntimeException("removeBucketMapping called with null: " + pathID);
+            return false;
         }
 
         // Remove all block mappings to this bucket and clear the bucket
@@ -495,6 +495,8 @@ public class TaoSubtree implements Subtree {
 
         // Clear bucket of blocks
         currentBucket.clearBucket();
+
+        return true;
     }
 
     @Override
