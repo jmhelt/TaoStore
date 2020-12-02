@@ -6,6 +6,9 @@ import java.util.List;
  * @brief Class to represent a bucket
  */
 public interface Bucket {
+
+    int getID();
+
     /**
      * @brief Method to add a block to this bucket as well as update the timestamp
      * @param block

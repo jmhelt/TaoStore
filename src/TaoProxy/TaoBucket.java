@@ -7,12 +7,18 @@ import com.google.common.primitives.Longs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @brief Implementation of a bucket for TaoStore implementing the Bucket interface
  */
 public class TaoBucket implements Bucket {
+
+    private static final AtomicInteger COUNTER = new AtomicInteger(0);
+
+    private final int id;
+
     // The blocks in this bucket
     protected Block[] mBlocks;
 
@@ -29,6 +35,9 @@ public class TaoBucket implements Bucket {
      * @brief Default constructor
      */
     public TaoBucket() {
+
+        id = COUNTER.getAndIncrement();
+
         // Initialize blocks to be empty
         mBlocks = new Block[TaoConfigs.BLOCKS_IN_BUCKET];
         for (int i = 0; i < TaoConfigs.BLOCKS_IN_BUCKET; i++) {
@@ -83,6 +92,11 @@ public class TaoBucket implements Bucket {
             mBlocks[i] = new TaoBlock();
             mBlocks[i].initFromSerialized(Arrays.copyOfRange(serialized, 12 + entireBlockSize * i, 12 + entireBlockSize + entireBlockSize * i));
         }
+    }
+
+    @Override
+    public int getID() {
+        return id;
     }
 
     /**
