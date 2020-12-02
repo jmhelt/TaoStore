@@ -258,11 +258,11 @@ public class TaoSubtree implements Subtree {
 
             // If the path is null at some level, we return null
             if (currentBucket == null) {
-                if (right) {
-                    System.out.println("right child of bucket " + previousBucket.getID() + " is null: " + pathID);
-                } else {
-                    System.out.println("left child of bucket " + previousBucket.getID() + " is null: " + pathID);
-                }
+//                if (right) {
+//                    System.out.println("right child of bucket " + previousBucket.getID() + " is null: " + pathID);
+//                } else {
+//                    System.out.println("left child of bucket " + previousBucket.getID() + " is null: " + pathID);
+//                }
                 return null;
             }
 
@@ -455,20 +455,35 @@ public class TaoSubtree implements Subtree {
 
         // Keep track of current bucket
         SubtreeBucket currentBucket = mRoot;
+        SubtreeBucket previousBucket = null;
 
         for (Boolean right : pathDirection) {
             // Remove all block mappings to this bucket and clear the bucket
+            if (currentBucket == null) {
+                if (right) {
+                    System.out.println("clearPath: right child of bucket " + previousBucket.getID() + " is null: " + pathID);
+                } else {
+                    System.out.println("clearPath: left child of bucket " + previousBucket.getID() + " is null: " + pathID);
+                }
+                throw new RuntimeException("removeBucketMapping called with null: " + pathID);
+            }
             removeBucketMapping(currentBucket);
             currentBucket.clearBucket();
 
             // Determine whether the path is turning left or right from current bucket
             if (right) {
                 // Move to next bucket
+                previousBucket = currentBucket;
                 currentBucket = currentBucket.getRight();
             } else {
                 // Move to next bucket
+                previousBucket = currentBucket;
                 currentBucket = currentBucket.getLeft();
             }
+        }
+
+        if (currentBucket == null) {
+            throw new RuntimeException("removeBucketMapping called with null: " + pathID);
         }
 
         // Remove all block mappings to this bucket and clear the bucket
