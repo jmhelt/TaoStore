@@ -259,9 +259,9 @@ public class TaoSubtree implements Subtree {
             // If the path is null at some level, we return null
             if (currentBucket == null) {
                 if (right) {
-                    System.out.println("right child of bucket " + previousBucket.getID() + " is null.");
+                    System.out.println("right child of bucket " + previousBucket.getID() + " is null: " + pathID);
                 } else {
-                    System.out.println("left child of bucket " + previousBucket.getID() + " is null.");
+                    System.out.println("left child of bucket " + previousBucket.getID() + " is null: " + pathID);
                 }
                 return null;
             }

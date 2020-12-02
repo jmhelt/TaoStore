@@ -60,6 +60,9 @@ public class TaoSubtreeBucket extends TaoBucket implements SubtreeBucket {
 
     @Override
     public boolean setRight(Bucket b, int level) {
+        if (b == null) {
+            System.out.println("setRight null for bucket: " + getID());
+        }
         if (mRight == null) {
             TaoLogger.logDebug("Subtree bucket is null");
             if (b != null) {
@@ -83,6 +86,9 @@ public class TaoSubtreeBucket extends TaoBucket implements SubtreeBucket {
 
     @Override
     public boolean setLeft(Bucket b, int level) {
+        if (b == null) {
+            System.out.println("setLeft null for bucket: " + getID());
+        }
         if (mLeft == null) {
             TaoLogger.logDebug("Subtree bucket is null");
             if (b != null) {
